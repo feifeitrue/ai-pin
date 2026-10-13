@@ -1,5 +1,6 @@
 import { app, Menu, shell, systemPreferences } from 'electron';
 import { join } from 'node:path';
+import { mkdirSync } from 'node:fs';
 import { resolveLang, strings, type Strings } from '../shared/i18n';
 import { SETTINGS_CH, type About, type AppStatus } from '../shared/ipc';
 import { hotkeyLabel } from '../shared/keys';
@@ -26,6 +27,7 @@ registerAppScheme();
 // Opt-in, isolated notification experiment: no second input hook or shared settings.
 const notifyOnly = process.env.LOLPING_CODEX_NOTIFY_ONLY === '1';
 // Keep the existing profile and single-instance scope when upgrading from lolPing.
+mkdirSync(settingsDir(), { recursive: true });
 app.setPath('userData', settingsDir());
 app.setAppUserModelId('com.lolping.app');
 

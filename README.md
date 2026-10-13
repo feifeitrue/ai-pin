@@ -4,7 +4,7 @@
 
 本项目基于 **[Danrui Meng（darrenprx）](https://github.com/darrenprx)** 开发的 **[lolPing](https://github.com/darrenprx/lolPing)** 修改，基线版本为 0.5.1。感谢原作者提供的桌面信号轮盘、动画音效播放和原生输入实现。本仓库是独立维护的二次开发版本，不是原作者的官方发行版。
 
-> 本项目由维护者作为非商业、纯娱乐与学习交流的同人二创项目维护，不收费、不售卖。若权利人认为本项目内容涉及侵权，请联系 **[feefdong@gmail.com](mailto:feefdong@gmail.com)**，维护者将及时核实并删除相关内容。该声明不代表已获得第三方素材授权，也不替代适用的许可证。
+> 本项目由维护者作为非商业、纯娱乐与学习交流的同人二创项目维护，不收费、不售卖。若权利人认为本项目内容涉及侵权，请联系 **[fefeedong@gmail.com](mailto:fefeedong@gmail.com)**，维护者将及时核实并删除相关内容。该声明不代表已获得第三方素材授权，也不替代适用的许可证。
 
 ## 相比原项目改了什么
 
@@ -63,6 +63,6 @@ npm run dist
 - 保留完整 [LICENSE](LICENSE)，源代码按 MIT 发布。维护者的非商业用途声明是项目运营说明，**不额外限制 MIT 已授予的代码使用权**。
 - `assets/textures` 中的英雄联盟信号图标和 `assets/sounds` 中的音效属于 **© Riot Games, Inc.**，来自原项目，**不属于 MIT 授权**。本仓库不授予这些素材的额外使用权。
 - 本项目不由 Riot Games、原项目作者或 OpenAI 赞助、背书或官方维护。相关商标归各自权利人所有。Riot 素材使用政策见 [Riot Games 官方法律页面](https://www.riotgames.com/en/legal)。
-- 涉及权利问题请联系 **[feefdong@gmail.com](mailto:feefdong@gmail.com)**，提供相关内容的位置和权属说明；维护者将及时核实并删除相关内容。
+- 涉及权利问题请联系 **[fefeedong@gmail.com](mailto:fefeedong@gmail.com)**，提供相关内容的位置和权属说明；维护者将及时核实并删除相关内容。
 
 `docs/design*.md` 和 `docs/media/` 来自上游，记录其原有设计与界面，可能包含本版本已删除的功能；本版本功能以本 README 和当前源码为准。

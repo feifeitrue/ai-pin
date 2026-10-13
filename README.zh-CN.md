@@ -63,4 +63,4 @@ Windows 原生构建需 Visual Studio C++ 工具链，使用 UTF-8 与符合标�
 源代码 MIT，Copyright (c) 2026 Danrui Meng。完整声明见 LICENSE。
 信号图标与音效 © Riot Games, Inc.，不属于 MIT 授权；本项目不由 Riot Games 背书。
 
-维护者以非商业、纯娱乐和学习交流目的维护本项目。若权利人认为内容涉及侵权，请联系 feefdong@gmail.com，维护者将及时核实并删除相关内容。该用途说明不改变 MIT 的代码授权，也不代表已取得第三方素材授权。
+维护者以非商业、纯娱乐和学习交流目的维护本项目。若权利人认为内容涉及侵权，请联系 fefeedong@gmail.com，维护者将及时核实并删除相关内容。该用途说明不改变 MIT 的代码授权，也不代表已取得第三方素材授权。

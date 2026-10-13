@@ -1,9 +1,9 @@
 {
-  "name": "lolping",
-  "productName": "lolPing",
-  "version": "0.5.1",
+  "name": "aiping",
+  "productName": "aiping",
+  "version": "0.5.2",
   "private": true,
-  "description": "AI Pin: local desktop pings, rectangular screenshot focus and Codex desktop integration",
+  "description": "aiping: local desktop pings, rectangular screenshot focus and Codex desktop integration",
   "author": "Danrui Meng (https://github.com/darrenprx)",
   "license": "MIT",
   "homepage": "https://github.com/feifeitrue/ai-pin#readme",
@@ -44,7 +44,7 @@
   },
   "build": {
     "appId": "com.lolping.app",
-    "productName": "lolPing",
+    "productName": "aiping",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -78,7 +78,7 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "lolPing-Setup-${version}.exe",
+      "artifactName": "aiping-Setup-${version}.exe",
       "include": "build/installer.nsh",
       "differentialPackage": false
     },
@@ -109,11 +109,11 @@
         }
       ],
       "extendInfo": {
-        "NSAccessibilityUsageDescription": "lolPing reads mouse and keyboard input to open the ping wheel."
+        "NSAccessibilityUsageDescription": "aiping reads mouse and keyboard input to open the ping wheel."
       }
     },
     "dmg": {
-      "artifactName": "lolPing-${version}-arm64.dmg"
+      "artifactName": "aiping-${version}-arm64.dmg"
     },
     "extraFiles": [
       {

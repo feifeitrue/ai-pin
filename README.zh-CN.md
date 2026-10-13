@@ -1,4 +1,4 @@
-# AI Pin · 本地信号 + Codex AI
+# aiping · 本地信号 + Codex AI
 
 项目介绍、原作者署名、相对上游的改动、非商业用途及权利联系说明见 [README](README.md)。本文件补充操作与构建细节。
 

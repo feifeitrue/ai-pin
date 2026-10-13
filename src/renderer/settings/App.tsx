@@ -117,13 +117,13 @@ function SettingsPage({ settings: s, status, update }: { settings: Settings; sta
     <div className="app">
       <div className="titlebar">
         <img src={textureUrl('generic_ping')} alt="" />
-        lolPing
+        aiping
       </div>
       <nav className="side">
         <div className="brand">
           <img src={textureUrl('pingwheel_basicpingrender')} alt="" />
           <div>
-            <b>lolPing</b>
+            <b>aiping</b>
             <span className="desc">{t.tagline}</span>
           </div>
         </div>

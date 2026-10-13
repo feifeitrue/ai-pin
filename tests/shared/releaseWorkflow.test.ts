@@ -24,9 +24,9 @@ describe('release workflow', () => {
 
   it('uploads the installer from the Windows job, and the disk image from the Mac job', () => {
     const win = job('windows');
-    expect(win).toContain('"release/lolPing-Setup-${GITHUB_REF_NAME#v}.exe"');
+    expect(win).toContain('"release/aiping-Setup-${GITHUB_REF_NAME#v}.exe"');
     expect(win).toContain('--clobber');
-    expect(job('mac')).toContain('release/lolPing-${GITHUB_REF_NAME#v}-arm64.dmg');
+    expect(job('mac')).toContain('release/aiping-${GITHUB_REF_NAME#v}-arm64.dmg');
   });
 
   it('publishes the draft in a last job that waits for both platform jobs', () => {

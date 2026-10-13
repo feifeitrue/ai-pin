@@ -25,8 +25,8 @@ const ACCESSIBILITY_PANE = 'x-apple.systempreferences:com.apple.preference.secur
 registerAppScheme();
 // Opt-in, isolated notification experiment: no second input hook or shared settings.
 const notifyOnly = process.env.LOLPING_CODEX_NOTIFY_ONLY === '1';
-if (notifyOnly) app.setPath('userData', join(app.getPath('appData'), 'lolPing-codex-preview'));
-if (process.env.AIPIN_DATA_DIR) app.setPath('userData',process.env.AIPIN_DATA_DIR);
+// Keep the existing profile and single-instance scope when upgrading from lolPing.
+app.setPath('userData', settingsDir());
 app.setAppUserModelId('com.lolping.app');
 
 if (!app.requestSingleInstanceLock()) {

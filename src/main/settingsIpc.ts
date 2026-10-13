@@ -1,0 +1,72 @@
+import { globalShortcut, ipcMain, shell } from 'electron';
+import type { Strings } from '../shared/i18n';
+import { SETTINGS_CH, type About, type AppStatus, type SetSettingsResult } from '../shared/ipc';
+import { hotkeyLabel, hotkeyToAccelerator, type Hotkey } from '../shared/keys';
+import { pingById, type PingId } from '../shared/pings';
+import type { Platform } from '../shared/platform';
+import { rendererPatch } from '../shared/settings';
+import type { SettingsStore } from './settingsStore';
+import type {CodexConnection} from './codexConnection';
+
+const PROJECT_URL = 'https://github.com/feifeitrue/ai-pin';
+
+export interface SettingsIpcDeps {
+  codex:CodexConnection;
+  store: SettingsStore;
+  getStatus(): AppStatus;
+  setEnabled(on: boolean): void;
+  preview(id: PingId): void;
+  about(): About;
+  retryHelper(): void;
+  setCapturing(on: boolean): void;
+  openAccessibility(): void;
+  /** Strings in the app's current language. */
+  text(): Strings;
+  platform: Platform;
+}
+
+/** Returns an error message when another app already owns this shortcut. */
+function hotkeyConflict(next: Hotkey, current: Hotkey, text: Strings, platform: Platform): string | null {
+  if (next.mods === current.mods && next.vk === current.vk) return null;
+  const accelerator = hotkeyToAccelerator(next);
+  if (!accelerator) return null;
+  try {
+    const free = globalShortcut.register(accelerator, () => undefined);
+    if (free) globalShortcut.unregister(accelerator);
+    return free ? null : text.hotkeyTaken(hotkeyLabel(next, platform));
+  } catch {
+    return null;
+  }
+}
+
+export function registerSettingsIpc(d: SettingsIpcDeps): void {
+  const reply=async<T>(fn:()=>Promise<T>)=>{try{return {ok:true,value:await fn()};}catch(e){return {ok:false,error:e instanceof Error?e.message:String(e)};}};
+  ipcMain.handle(SETTINGS_CH.codexStatus,()=>d.codex.status());
+  ipcMain.handle(SETTINGS_CH.codexDiscover,()=>reply(()=>d.codex.discover()));
+  ipcMain.handle(SETTINGS_CH.codexConnect,(_e,id:unknown)=>reply(()=>{if(typeof id!=='string')throw Error('请选择接收聊天');return d.codex.connect(id);}));
+  ipcMain.handle(SETTINGS_CH.get, () => d.store.get());
+  ipcMain.handle(SETTINGS_CH.set, (_e, raw: unknown): SetSettingsResult => {
+    const patch = rendererPatch(raw);
+    if (patch.toggleHotkey) {
+      const error = hotkeyConflict(patch.toggleHotkey, d.store.get().toggleHotkey, d.text(), d.platform);
+      if (error) return { ok: false, error, settings: d.store.get() };
+    }
+    return { ok: true, settings: d.store.update(patch) };
+  });
+  ipcMain.handle(SETTINGS_CH.status, () => d.getStatus());
+  ipcMain.handle(SETTINGS_CH.setEnabled, (_e, on: unknown) => d.setEnabled(on === true));
+  ipcMain.handle(SETTINGS_CH.preview, (_e, id: unknown) => {
+    const p = typeof id === 'string' ? pingById(id) : undefined;
+    if (p) d.preview(p.id);
+  });
+  ipcMain.handle(SETTINGS_CH.about, () => d.about());
+  ipcMain.handle(SETTINGS_CH.openFolder, async () => {
+    await shell.openPath(d.store.dir);
+  });
+  ipcMain.handle(SETTINGS_CH.openProject, async () => {
+    await shell.openExternal(PROJECT_URL);
+  });
+  ipcMain.handle(SETTINGS_CH.retryHelper, () => d.retryHelper());
+  ipcMain.handle(SETTINGS_CH.capture, (_e, on: unknown) => d.setCapturing(on === true));
+  ipcMain.handle(SETTINGS_CH.openAccessibility, () => d.openAccessibility());
+}

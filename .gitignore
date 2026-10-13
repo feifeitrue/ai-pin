@@ -1,0 +1,23 @@
+node_modules/
+out/
+dist/
+release/
+work/
+native/hook-helper/build/
+*.log
+.DS_Store
+tools/extract-assets/.cache/
+tools/extract-assets/__pycache__/
+
+# Personal screenshots, AI results, bindings and credentials must stay local.
+captures/
+notes/
+tasks/
+binding.json
+connection.json
+settings.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key

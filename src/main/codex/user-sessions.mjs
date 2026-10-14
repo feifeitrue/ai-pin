@@ -32,6 +32,16 @@ export async function findUserSession(id) {
   for await(const name of glob(`**/*${id}.jsonl`,{cwd:root}))return inspect(join(root,name));
   return null;
 }
+/** Enumerate every existing rollout once when a thread enters the monitor. */
+export async function findUserSessionFiles(id) {
+  if(typeof id!=='string'||!/^[a-zA-Z0-9-]+$/.test(id))return [];
+  const found=[];
+  for await(const name of glob(`**/*${id}*.jsonl`,{cwd:root})){
+    try{const item=await inspect(join(root,name));if(item?.threadId===id)found.push(item);}
+    catch(e){if(e.code!=='ENOENT')throw e;}
+  }
+  return found;
+}
 /** Watches activity across the complete session tree, including older chats resumed later. */
 export function watchUserSessions() {
   const dirty=new Set();let error=null;

@@ -1,7 +1,7 @@
 {
   "name": "ai-ping",
   "productName": "ai-ping",
-  "version": "0.5.5",
+  "version": "0.5.6-rc.1",
   "private": true,
   "description": "ai-ping: local desktop pings, rectangular screenshot focus and Codex desktop integration",
   "author": {

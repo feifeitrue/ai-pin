@@ -1,7 +1,6 @@
-import { sessionsRoot } from './user-sessions.mjs';
-import { glob, open, stat } from 'node:fs/promises';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { findUserSessionFiles } from './user-sessions.mjs';
+import { open, stat } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { randomUUID } from 'node:crypto';
 
@@ -10,6 +9,11 @@ const parse = text => { try { return JSON.parse(text); } catch { return null; } 
 /** Reads structured request/answer records only; ordinary prose never creates alerts. */
 export class QuestionTracker {
   calls = new Map();
+  // Rotation may repeat an old call or reveal its reply before the call file.
+  resolved = new Set();
+  answers = new Map();
+  accepted = new Set();
+  finish(id) { this.calls.delete(id); this.answers.delete(id); this.accepted.delete(id); this.resolved.add(id); }
   ingest(record) {
     if (record.type !== 'response_item') return;
     const p = record.payload;
@@ -17,17 +21,21 @@ export class QuestionTracker {
     const name = p.name?.split('.').at(-1);
     if (p.type === 'function_call' && ['request_user_input_async', 'request_user_input'].includes(name)) {
       const args = parse(p.arguments);
-      if (!p.call_id || !Array.isArray(args?.questions) || !args.questions.length || this.calls.has(p.call_id)) return;
+      if (!p.call_id || !Array.isArray(args?.questions) || !args.questions.length || this.calls.has(p.call_id) || this.resolved.has(p.call_id)) return;
+      const remaining = new Set(args.questions.map((_, i) => i).filter(i => !this.answers.get(p.call_id)?.has(i)));
+      if (!remaining.size) { this.finish(p.call_id); return; }
       this.calls.set(p.call_id, {
-        async: name === 'request_user_input_async', accepted: name === 'request_user_input',
-        remaining: new Set(args.questions.map((_, i) => i)),
+        async: name === 'request_user_input_async', accepted: name === 'request_user_input' || this.accepted.has(p.call_id),
+        remaining,
         summary: String(args.questions[0].title || args.questions[0].question || 'Codex 需要你回答').slice(0, 220),
       });
     } else if (p.type === 'function_call_output') {
       const q = this.calls.get(p.call_id);
-      if (!q) return;
-      if (q.async && parse(p.output)?.accepted === true) q.accepted = true;
-      else this.calls.delete(p.call_id);
+      if (this.resolved.has(p.call_id)) return;
+      const value = parse(p.output);
+      if (value?.accepted === true && (!q || q.async)) {
+        this.accepted.add(p.call_id); if (q) q.accepted = true;
+      } else if (q || value?.accepted === false || value?.answers) this.finish(p.call_id);
     } else if (p.type === 'message' && p.role === 'user') {
       for (const content of p.content || []) {
         const match = /^\s*<send_user_message_question_reply>\s*([\s\S]*?)\s*<\/send_user_message_question_reply>\s*$/.exec(content.text || '');
@@ -36,10 +44,11 @@ export class QuestionTracker {
         for (const reply of replies) {
           const key = parse(reply.questionItemId);
           if (!Array.isArray(key) || key[0] !== 'request_user_input_async') continue;
+          if (typeof key[1] !== 'string' || !Number.isInteger(key[2]) || key[2] < 0 || this.resolved.has(key[1])) continue;
+          const answered = this.answers.get(key[1]) || new Set();
+          answered.add(key[2]); this.answers.set(key[1], answered);
           const q = this.calls.get(key[1]);
-          if (!q) continue;
-          q.remaining.delete(key[2]);
-          if (!q.remaining.size) this.calls.delete(key[1]);
+          if (q) { q.remaining.delete(key[2]); if (!q.remaining.size) this.finish(key[1]); }
         }
       }
     }
@@ -64,25 +73,18 @@ export class NativeAttention {
   }
 }
 
+/** File-local bytes only. Question state belongs to the thread, never to a file. */
 class TranscriptTail {
-  since=Date.now();
-  tracker = new QuestionTracker();
   offset = 0;
   decoder = new StringDecoder('utf8');
   partial = '';
-  file = null;
-  constructor(threadId, terminal) { this.threadId = threadId; this.terminal = terminal; this.primed=false; }
+  primed = false;
+  constructor(file, since) { this.file = file; this.since = since; }
   async read() {
-    if (!this.file) {
-      if (!/^[a-zA-Z0-9-]+$/.test(this.threadId)) throw new Error('Invalid thread id');
-      for await (const file of glob(`**/*${this.threadId}.jsonl`, { cwd: sessionsRoot })) {
-        this.file = join(sessionsRoot, file); break;
-      }
-      if (!this.file) throw new Error('Chat transcript not found');
-    }
     const size = (await stat(this.file)).size;
-    if (size < this.offset) { this.offset = 0; this.partial = ''; this.decoder = new StringDecoder('utf8'); this.tracker = new QuestionTracker(); }
-    if (size === this.offset) return this.tracker.pending();
+    if (size < this.offset) { this.offset = 0; this.partial = ''; this.decoder = new StringDecoder('utf8'); this.primed = false; }
+    const records = [];
+    if (size === this.offset) return records;
     const file = await open(this.file, 'r');
     try {
       const buffer = Buffer.alloc(Math.min(size - this.offset, 1024 * 1024));
@@ -95,33 +97,38 @@ class TranscriptTail {
         while ((end = this.partial.indexOf('\n')) >= 0) {
           const record = parse(this.partial.slice(0, end));
           this.partial = this.partial.slice(end + 1);
-          if (record) {
-            const live=this.primed||Date.parse(record.timestamp)>=this.since;
-            // First connection must not resurrect old, abandoned question cards.
-            // Genuine pre-existing waits are recovered from the native waiting flags.
-            if(live)this.tracker.ingest(record);
-            const p=record.payload;
-            if(live&&record.type==='event_msg'&&typeof p?.turn_id==='string'){
-              if(p.type==='task_complete')this.terminal?.(p.turn_id,'completed');
-              else if(p.type==='turn_aborted')this.terminal?.(p.turn_id,'interrupted');
-            }
-          }
+          if (!record) continue;
+          const timestamp = Date.parse(record.timestamp);
+          // Copied historical records must stay historical even in an already-read file.
+          const live = Number.isFinite(timestamp) ? timestamp >= this.since : this.primed;
+          if (live && (record.type === 'event_msg' || record.type === 'response_item')) records.push(record);
         }
       }
     } finally { await file.close(); }
-    this.primed=true;
-    return this.tracker.pending();
+    this.primed = true;
+    return records;
   }
 }
+
+const eventOrder = r => r.payload?.type === 'function_call' ? 0 : r.payload?.type === 'function_call_output' ? 1 : 2;
+const recordTime = r => Number.isFinite(Date.parse(r.timestamp)) ? Date.parse(r.timestamp) : 0;
 
 export function startAttentionMonitor({ threadIds, state, readStatus, log, discover, now = Date.now, automatic = true }) {
   const monitorSince=Date.now();
   const scopes = new Map();
+  const addFile = (scope, file) => {
+    const path = resolve(file), key = process.platform === 'win32' ? path.toLowerCase() : path;
+    if (!scope.tails.has(key)) scope.tails.set(key, new TranscriptTail(path, monitorSince));
+  };
   const add = ({threadId,file}) => {
-    if(scopes.has(threadId)){const scope=scopes.get(threadId);scope.dirty=true;if(scope.idle)scope.nextPoll=now();scope.idle=false;return;}
-    const scope={threadId,tail:new TranscriptTail(threadId,(turnId,status)=>{if(status==='completed')state.complete(turnId);else state.emit(status,{turnId,threadId});}),native:new NativeAttention(),ids:new Set(),nativeIds:new Set(),ready:false,idle:false,dirty:true,nextPoll:0,failures:0};
-    scope.tail.since=monitorSince;
-    if(file)scope.tail.file=file;
+    if(scopes.has(threadId)){
+      const scope=scopes.get(threadId);
+      if(file)addFile(scope,file);
+      scope.dirty=true;if(scope.idle)scope.nextPoll=now();scope.idle=false;return;
+    }
+    const scope={threadId,tails:new Map(),tracker:new QuestionTracker(),filesResolved:false,
+      native:new NativeAttention(),ids:new Set(),nativeIds:new Set(),ready:false,idle:false,dirty:true,nextPoll:0,failures:0};
+    if(file)addFile(scope,file);
     for(const [id,summary] of state.pending){
       const q=`auto:${threadId}:question:`, n=`auto:${threadId}:native:`;
       if(id.startsWith(q))scope.ids.add(id);
@@ -131,7 +138,7 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
   };
   threadIds.forEach(threadId=>add({threadId}));
   let reading = false, polling = false, stopped = false;
-  const health = { mode:discover?'all-user-chats':'selected-chats',threads:[...scopes.keys()],transcriptError:null,statusError:null,statusReads:0,statusFailures:0,maxConcurrent:0 };
+  const health = { mode:discover?'all-user-chats':'selected-chats',threads:[...scopes.keys()],transcriptError:null,statusError:null,statusReads:0,statusFailures:0,maxConcurrent:0,transcriptFiles:0 };
   const reconcile = (scope, source, pending, previous) => {
     const next = new Set(pending.map(q => `auto:${scope.threadId}:${source}:${q.id}`));
     for (const q of pending) {
@@ -150,10 +157,33 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
       for(const scope of scopes.values()){
         if(discover&&!scope.dirty)continue;
         scope.dirty=false;
-        try{scope.ids=reconcile(scope,'question',await scope.tail.read(),scope.ids);scope.ready=true;}
-        catch(e){scope.dirty=true;health.transcriptError=`${scope.threadId}: ${e.message}`;}
+        try{
+          if(!scope.filesResolved){
+            for(const item of await findUserSessionFiles(scope.threadId))addFile(scope,item.file);
+            scope.filesResolved=true;
+          }
+          const records=[];
+          for(const tail of [...scope.tails.values()].sort((a,b)=>a.file.localeCompare(b.file))){
+            try{records.push(...await tail.read());}
+            catch(e){if(e.code!=='ENOENT'){scope.dirty=true;health.transcriptError=`${scope.threadId}: ${e.message}`;}}
+          }
+          // One reconciliation after the entire batch: discovery order cannot create
+          // a transient question ping for an already-answered cross-file question.
+          records.sort((a,b)=>recordTime(a)-recordTime(b)||eventOrder(a)-eventOrder(b));
+          for(const record of records){
+            scope.tracker.ingest(record);
+            const p=record.payload;
+            if(record.type==='event_msg'&&typeof p?.turn_id==='string'){
+              if(p.type==='task_complete')state.complete(p.turn_id);
+              else if(p.type==='turn_aborted')state.emit('interrupted',{turnId:p.turn_id,threadId:scope.threadId});
+            }
+          }
+          scope.ids=reconcile(scope,'question',scope.tracker.pending(),scope.ids);scope.ready=true;
+        }catch(e){scope.dirty=true;health.transcriptError=`${scope.threadId}: ${e.message}`;}
+
       }
       health.threads=[...scopes.values()].filter(s=>!s.idle).map(s=>s.threadId);
+      health.transcriptFiles=[...scopes.values()].reduce((n,s)=>n+s.tails.size,0);
     } catch (e) { health.transcriptError = e.message; }
     finally { reading = false; }
   }
@@ -170,7 +200,7 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
         scope.nextPoll=now()+5000;health.statusReads++;
         try{
           const status=await readStatus(scope.threadId);
-          scope.nativeIds=reconcile(scope,'native',scope.native.update(status,scope.tail.tracker.pending().length>0),scope.nativeIds);
+          scope.nativeIds=reconcile(scope,'native',scope.native.update(status,scope.tracker.pending().length>0),scope.nativeIds);
           scope.failures=0;
           // Unloaded chats are quiescent too. Keep their transcript offsets and pending
           // state: new file activity reattaches them without replaying old history.
@@ -181,6 +211,7 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
         }
       }));
       health.threads=[...scopes.values()].filter(s=>!s.idle).map(s=>s.threadId);
+      health.transcriptFiles=[...scopes.values()].reduce((n,s)=>n+s.tails.size,0);
     } catch (e) { health.statusError = e.message; }
     finally { polling = false; }
   }

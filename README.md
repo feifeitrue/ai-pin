@@ -1,5 +1,7 @@
 # aiping · 桌面信号 + Codex AI
 
+> **当前支持范围：AI 联动暂时只支持 Codex Windows 桌面版。** 暂不支持 Codex 网页版、CLI、macOS 桌面版或其他 AI 工具；普通本地 ping 无需连接 Codex。
+
 在桌面上发出 ping，用截图和指向位置向 Codex 提问；也可以先框出重点，再发信号。普通 ping 保持独立可用。
 
 本项目基于 **[Danrui Meng（darrenprx）](https://github.com/darrenprx)** 开发的 **[lolPing](https://github.com/darrenprx/lolPing)** 修改，基线版本为 0.5.1。感谢原作者提供的桌面信号轮盘、动画音效播放和原生输入实现。本仓库是独立维护的二次开发版本，不是原作者的官方发行版。

@@ -1,5 +1,7 @@
 # aiping · 本地信号 + Codex AI
 
+> **当前支持范围：AI 联动暂时只支持 Codex Windows 桌面版。** 暂不支持 Codex 网页版、CLI、macOS 桌面版或其他 AI 工具；普通本地 ping 无需连接 Codex。
+
 项目介绍、原作者署名、相对上游的改动、非商业用途及权利联系说明见 [README](README.md)。本文件补充操作与构建细节。
 
 这是基于 Danrui Meng 的 lolPing 0.5.1 及现有 Codex 修改版制作的精简版本。

@@ -2,8 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-// The release workflow cannot run here, so these checks keep its ordering from regressing: installed apps read latest.yml from the
-// newest *published* release, so the release has to stay a draft until both installers and the update files are uploaded.
+// Source updates and candidate builds must not silently publish or overwrite a release.
 const workflow = readFileSync(join(__dirname, '../../.github/workflows/release.yml'), 'utf8').replace(/\r\n/g, '\n');
 
 /** The text of one top-level job. */
@@ -29,11 +28,12 @@ describe('release workflow', () => {
     expect(job('mac')).toContain('release/ai-ping-${GITHUB_REF_NAME#v}-arm64.dmg');
   });
 
-  it('publishes the draft in a last job that waits for both platform jobs', () => {
-    const publish = job('publish');
-    expect(publish).toMatch(/needs: \[windows, mac\]/);
-    expect(publish).toContain('gh release edit "$GITHUB_REF_NAME" --draft=false');
-    expect(publish).toMatch(/GH_REPO: \$\{\{ github\.repository \}\}/); // no checkout in this job, so gh needs to be told the repository
+  it('requires manual dispatch and leaves publication to a maintainer', () => {
+    expect(workflow).toContain('  workflow_dispatch:');
+    expect(workflow).not.toMatch(/^  (push|pull_request|schedule):/m);
+    expect(workflow).not.toContain('--draft=false');
+    expect(workflow).not.toContain('\n  publish:');
+    expect(job('release')).toContain('Refusing to overwrite an already published release.');
   });
 
   it('leaves no git credentials behind in the platform jobs (gh uses GH_TOKEN, and nothing there pushes)', () => {

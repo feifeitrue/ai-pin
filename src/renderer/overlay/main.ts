@@ -34,8 +34,8 @@ function applySettings(s: OverlaySettings): void {
 applySettings(settings);
 
 function ping(def: PingDef, x: number, y: number): void {
-  spawnPing(pingLayer, def, x, y, { sizePx: settings.pingSizePx, durationS: settings.pingDurationS });
-  sounds.play(def.sound, volume());
+  const options = { sizePx: settings.pingSizePx, durationS: settings.pingDurationS };
+  sounds.play(def.sound, volume(), () => spawnPing(pingLayer, def, x, y, options));
 }
 
 window.overlay.on('overlay:settings', applySettings);
@@ -44,6 +44,7 @@ window.overlay.on('region:loading', ()=>{pingWheel.cancel();selection.loading();
 window.overlay.on('region:pointer', p=>selection.pointer(p));
 window.overlay.on('region:close', ()=>{selection.close();pingWheel.cancel();});
 window.overlay.on('wheel:open', (p) => {
+  void sounds.warm();
   wheelSelection=p.selection;
   pingWheel.open(p.x,p.y);
 });

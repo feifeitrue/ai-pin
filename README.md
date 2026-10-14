@@ -6,6 +6,88 @@
 
 > 本项目由维护者作为非商业、纯娱乐与学习交流的同人二创项目维护，不收费、不售卖。若权利人认为本项目内容涉及侵权，请联系 **[fefeedong@gmail.com](mailto:fefeedong@gmail.com)**，维护者将及时核实并删除相关内容。该声明不代表已获得第三方素材授权，也不替代适用的许可证。
 
+## 功能演示
+
+以下为按真实交互编排的**功能演示动画，非实时录屏**；回答为预设示例，等待时间已缩短。每段约 18 秒，GIF 无声，MP4 带对应信号音效。
+
+### 问号：解释所指内容
+
+框选内容，在选区外发问号；以框内为主解释原因与适用边界。
+
+![问号：解释所指内容](docs/media/aiping/aiping-question.gif)
+
+[查看有声 MP4](docs/media/aiping/aiping-question.mp4)
+
+<details>
+<summary>全力进攻：表达观点（展开动画）</summary>
+
+针对所指话题给出明确观点、理由、适用条件和关键反例。
+
+![全力进攻：表达观点](docs/media/aiping/aiping-allin.gif)
+
+[查看有声 MP4](docs/media/aiping/aiping-allin.mp4)
+
+</details>
+
+<details>
+<summary>需要视野：整理并保存（展开动画）</summary>
+
+框选值得留存的内容，整理笔记，写入成功后才提示已保存。
+
+![需要视野：整理并保存](docs/media/aiping/aiping-needvision.gif)
+
+[查看有声 MP4](docs/media/aiping/aiping-needvision.mp4)
+
+</details>
+
+<details>
+<summary>敌方视野：分析并记录（展开动画）</summary>
+
+自由指向内容，保存正文、原图、局部图和对应坐标。
+
+![敌方视野：分析并记录](docs/media/aiping/aiping-enemyvision.gif)
+
+[查看有声 MP4](docs/media/aiping/aiping-enemyvision.mp4)
+
+</details>
+
+<details>
+<summary>请求协助：带你理解知识（展开动画）</summary>
+
+先通俗讲解，再举例、对比并指出常见误解。
+
+![请求协助：带你理解知识](docs/media/aiping/aiping-assist.gif)
+
+[查看有声 MP4](docs/media/aiping/aiping-assist.mp4)
+
+</details>
+
+## 各种 ping 的功能状态
+
+**全部 11 种 ping 的本地图标、动画和音效都可用。** 下表的“待实现”仅指用户发出该信号后对应的 **AI 联动功能**，不表示普通桌面信号不能使用。
+
+| 信号 | 用户发送后的 AI 功能 | 状态 |
+| --- | --- | --- |
+| 问号 / 敌人消失（missing） | 理解所指内容，解释原因与适用边界 | 已实现 |
+| 全力进攻（allin） | 给出观点、理由、条件及关键反例 | 已实现 |
+| 需要视野（needvision） | 分析并保存正文、截图和坐标 | 已实现 |
+| 敌方视野（enemyvision） | 分析并保存正文、截图和坐标 | 已实现 |
+| 请求协助（assist） | 通俗讲解知识、举例并指出常见误解 | 已实现 |
+| 危险（danger） | 待设计的 AI 行为 | 待实现，欢迎提 Issue |
+| 推进（push） | 待设计的 AI 行为 | 待实现，欢迎提 Issue |
+| 正在赶来 / 正在路上（omw） | 用户主动发送后的 AI 行为 | 待实现，欢迎提 Issue |
+| 普通信号（generic） | 待设计的 AI 行为 | 待实现，欢迎提 Issue |
+| 诱饵（bait） | 待设计的 AI 行为 | 待实现，欢迎提 Issue |
+| 视野已清除（visioncleared） | 待设计的 AI 行为 | 待实现，欢迎提 Issue |
+
+自动提醒已实现：Codex 需要回答或审批时发出“请求协助”，本轮结束时发出“正在赶来 / 正在路上”。这些是程序提醒，不会再次触发截图或 AI 任务，与用户主动发送信号的 AI 映射分别处理。
+
+对尚未实现的信号有想法？欢迎 [提交 Issue](https://github.com/feifeitrue/ai-pin/issues/new)，说说你希望在哪个场景使用这个 ping，以及期待 AI 做什么。
+
+## 即将推出
+
+**支持自定义 ping 提示词的版本很快也会到来。** 届时可以按自己的习惯设置各个 ping 要交给 AI 的指令。当前发布版尚未提供这个设置；欢迎在 [Issues](https://github.com/feifeitrue/ai-pin/issues) 分享想法和使用场景。
+
 ## 相比原项目改了什么
 
 | 范围 | 本版本内容 |
@@ -70,4 +152,4 @@ npm run dist
 - 本项目不由 Riot Games、原项目作者或 OpenAI 赞助、背书或官方维护。相关商标归各自权利人所有。Riot 素材使用政策见 [Riot Games 官方法律页面](https://www.riotgames.com/en/legal)。
 - 涉及权利问题请联系 **[fefeedong@gmail.com](mailto:fefeedong@gmail.com)**，提供相关内容的位置和权属说明；维护者将及时核实并删除相关内容。
 
-`docs/design*.md` 和 `docs/media/` 来自上游，记录其原有设计与界面，可能包含本版本已删除的功能；本版本功能以本 README 和当前源码为准。
+`docs/design*.md` 和 `docs/media/` 中原有图片来自上游，可能包含本版本已删除的功能；`docs/media/aiping/` 是本版本新制作的功能演示动画。本版本功能以本 README 和当前源码为准。

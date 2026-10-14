@@ -105,29 +105,9 @@
 
 **[下载 Windows x64 安装包（0.5.2）](https://github.com/feifeitrue/ai-pin/releases/download/windows-0.5.2-preview.1/aiping-Setup-0.5.2.exe)** · [安装与连接说明](https://github.com/feifeitrue/ai-pin/releases/tag/windows-0.5.2-preview.1)
 
-### 推荐：让 AI 帮你完成安装和连接
+建议使用 AI 助手协助完成安装和初次使用；也可以按照下面的步骤自行操作。
 
-建议把整个安装过程交给已具备本机文件和桌面操作权限的 AI 助手执行：让它下载安装包、运行安装向导、启动 aiping，再检查 Codex 连接。无需自己下载源码或编译。
-
-可以直接把下面这段发给 Codex：
-
-```text
-请帮我安装并连接 aiping，直接操作，不要只给步骤。
-
-项目：https://github.com/feifeitrue/ai-pin
-安装包：https://github.com/feifeitrue/ai-pin/releases/download/windows-0.5.2-preview.1/aiping-Setup-0.5.2.exe
-
-先确认这台机器是 Windows x64。从上述地址下载并运行安装包，优先安装到 D 盘，没有 D 盘则使用默认目录。若已有旧版在运行，先提醒我保存任务并退出旧版。
-安装后从快捷方式启动 aiping，打开“Codex 连接”，点击“连接 Codex”。让我指定接收截图的聊天，选择它并点击“连接并启用 AI”，核对已连接状态和聊天名称。
-经我确认测试内容后，使用不含敏感信息的页面发一个问号，验证截图到达指定聊天并得到回答。
-不要另装 Node 或编译工具，不要改 Codex hooks、权限设置或自带提示音。
-遇到登录、系统授权或需要我决定的安全提示，请交给我操作；不要关闭系统防护。若你无法操作桌面，明确告诉我哪一步需要手动点击，不要声称已经完成。
-最后说明安装、启动、连接和首次截图分析分别是否成功。
-```
-
-AI 能执行的范围取决于它在本机的操作能力和权限；账号登录和系统授权仍需你配合。当前安装包未签名，Windows 可能显示未知发布者提示。
-
-### 手动安装与连接 Codex
+### 安装后如何连接 Codex
 
 1. **安装 aiping。** 下载上方 `.exe`，按向导安装，再从桌面或开始菜单快捷方式启动。
 2. **打开 Codex 桌面版并登录。** 新建或打开一个接收截图的聊天，例如“aiping 助手”，先发送一句消息，方便在列表中识别。

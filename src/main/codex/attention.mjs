@@ -114,12 +114,12 @@ class TranscriptTail {
   }
 }
 
-export function startAttentionMonitor({ threadIds, state, readStatus, log, discover }) {
+export function startAttentionMonitor({ threadIds, state, readStatus, log, discover, now = Date.now, automatic = true }) {
   const monitorSince=Date.now();
   const scopes = new Map();
   const add = ({threadId,file}) => {
-    if(scopes.has(threadId)){scopes.get(threadId).idle=false;return;}
-    const scope={threadId,tail:new TranscriptTail(threadId,(turnId,status)=>{if(status==='completed')state.complete(turnId);else state.emit(status,{turnId,threadId});}),native:new NativeAttention(),ids:new Set(),nativeIds:new Set(),ready:false,idle:false};
+    if(scopes.has(threadId)){const scope=scopes.get(threadId);scope.dirty=true;if(scope.idle)scope.nextPoll=now();scope.idle=false;return;}
+    const scope={threadId,tail:new TranscriptTail(threadId,(turnId,status)=>{if(status==='completed')state.complete(turnId);else state.emit(status,{turnId,threadId});}),native:new NativeAttention(),ids:new Set(),nativeIds:new Set(),ready:false,idle:false,dirty:true,nextPoll:0,failures:0};
     scope.tail.since=monitorSince;
     if(file)scope.tail.file=file;
     for(const [id,summary] of state.pending){
@@ -131,7 +131,7 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
   };
   threadIds.forEach(threadId=>add({threadId}));
   let reading = false, polling = false, stopped = false;
-  const health = { mode:discover?'all-user-chats':'selected-chats',threads:[...scopes.keys()],transcriptError:null,statusError:null };
+  const health = { mode:discover?'all-user-chats':'selected-chats',threads:[...scopes.keys()],transcriptError:null,statusError:null,statusReads:0,statusFailures:0,maxConcurrent:0 };
   const reconcile = (scope, source, pending, previous) => {
     const next = new Set(pending.map(q => `auto:${scope.threadId}:${source}:${q.id}`));
     for (const q of pending) {
@@ -148,9 +148,10 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
       if(discover)for(const item of await discover())add(item);
       health.transcriptError=null;
       for(const scope of scopes.values()){
-        if(scope.idle)continue;
+        if(discover&&!scope.dirty)continue;
+        scope.dirty=false;
         try{scope.ids=reconcile(scope,'question',await scope.tail.read(),scope.ids);scope.ready=true;}
-        catch(e){health.transcriptError=`${scope.threadId}: ${e.message}`;}
+        catch(e){scope.dirty=true;health.transcriptError=`${scope.threadId}: ${e.message}`;}
       }
       health.threads=[...scopes.values()].filter(s=>!s.idle).map(s=>s.threadId);
     } catch (e) { health.transcriptError = e.message; }
@@ -161,20 +162,30 @@ export function startAttentionMonitor({ threadIds, state, readStatus, log, disco
     polling = true;
     try {
       health.statusError=null;
-      await Promise.all([...scopes.values()].filter(s=>!s.idle).map(async scope=>{
+      // One bounded batch, oldest due first. A busy/failed chat cannot monopolize the queue.
+      const batch=[...scopes.values()].filter(s=>!s.idle&&s.nextPoll<=now())
+        .sort((a,b)=>a.nextPoll-b.nextPoll).slice(0,2);
+      health.maxConcurrent=Math.max(health.maxConcurrent,batch.length);
+      await Promise.all(batch.map(async scope=>{
+        scope.nextPoll=now()+5000;health.statusReads++;
         try{
           const status=await readStatus(scope.threadId);
           scope.nativeIds=reconcile(scope,'native',scope.native.update(status,scope.tail.tracker.pending().length>0),scope.nativeIds);
-          // Quiet chats need no polling; any new transcript activity reattaches them.
-          if(discover&&scope.ready&&status.type==='idle'&&!scope.tail.tracker.calls.size&&!scope.nativeIds.size)scope.idle=true;
-        }catch(e){health.statusError=`${scope.threadId}: ${e.message}`;}
+          scope.failures=0;
+          // Unloaded chats are quiescent too. Keep their transcript offsets and pending
+          // state: new file activity reattaches them without replaying old history.
+          if(discover&&['idle','notLoaded','systemError'].includes(status.type))scope.idle=true;
+        }catch(e){
+          health.statusFailures++;health.statusError=`${scope.threadId}: ${e.message}`;
+          scope.failures++;scope.nextPoll=now()+Math.min(60000,5000*2**Math.min(scope.failures-1,4));
+        }
       }));
       health.threads=[...scopes.values()].filter(s=>!s.idle).map(s=>s.threadId);
     } catch (e) { health.statusError = e.message; }
     finally { polling = false; }
   }
-  const transcriptTimer = setInterval(readTranscripts, 700);
-  const statusTimer = setInterval(pollStatus, 2500);
-  void readTranscripts().then(pollStatus);
-  return { health, stop: () => { stopped = true; clearInterval(transcriptTimer); clearInterval(statusTimer); } };
+  const transcriptTimer = automatic ? setInterval(readTranscripts, 700) : null;
+  const statusTimer = automatic ? setInterval(pollStatus, 2500) : null;
+  if(automatic)void readTranscripts().then(pollStatus);
+  return { health, readTranscripts, pollStatus, stop: () => { stopped = true; clearInterval(transcriptTimer); clearInterval(statusTimer); } };
 }

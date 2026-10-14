@@ -1,7 +1,7 @@
 {
   "name": "aiping",
   "productName": "aiping",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "private": true,
   "description": "aiping: local desktop pings, rectangular screenshot focus and Codex desktop integration",
   "author": "Danrui Meng (https://github.com/darrenprx)",

@@ -105,7 +105,7 @@
 
 ## 开始使用
 
-**[下载 Windows x64 安装包（0.5.3）](https://github.com/feifeitrue/ai-pin/releases/download/windows-0.5.3-preview.1/aiping-Setup-0.5.3.exe)** · [安装与连接说明](https://github.com/feifeitrue/ai-pin/releases/tag/windows-0.5.3-preview.1)
+**[下载 Windows x64 安装包（0.5.4）](https://github.com/feifeitrue/ai-pin/releases/download/windows-0.5.4-preview.1/aiping-Setup-0.5.4.exe)** · [安装与连接说明](https://github.com/feifeitrue/ai-pin/releases/tag/windows-0.5.4-preview.1)
 
 建议使用 AI 助手协助完成安装和初次使用；也可以按照下面的步骤自行操作。
 
@@ -148,6 +148,12 @@ npm run dist
 
 `npm run dist` 生成 Windows 安装包到 `release/`。日常开发可使用 `npm run dev`。macOS 原实现保留，但本版本的一键 Codex 接入仅支持 Windows，未做 macOS 实机验收。
 
+## 0.5.4：音画同步
+
+信号音效提交播放后，按设备输出时间和音效起音位置安排图标出现；打开轮盘时提前唤醒音频。动画不再总是抢在声音前面，等待时间随设备变化，不固定为 90 毫秒。
+
+为保留操作反馈，单次同步等待上限为 120 毫秒。静音、音效缺失或同时播放数量超限时，图标立即显示；截图和 AI 发送不等待动画。没有增加后台持续播放的静音音轨。该方案已由维护者在开发机对比试听后采用，其他设备仍欢迎反馈。
+
 ## 0.5.3：降低后台监听负载
 
 - 修复已结束、未加载的聊天仍不断读取的问题；聊天重新活跃时继续接收提醒，不重读整段历史。
@@ -165,7 +171,7 @@ npm run dist
 - Codex 连接使用桌面兼容接口，并非承诺长期稳定的公开集成 API。已验证桌面版 `26.1007.2314.0`，升级后需复测。
 - 已在另一台安装了 Codex 的机器上安装测试了 aiping 安装包。
 - 开发机已验证 Windows 双屏 100% 缩放；真实混合缩放和 macOS 尚未验收。
-- 开发阶段曾通过 165 项应用测试及 26 项连接层测试。仓库 CI 用于对后续修改重新验证；不把自动测试当作所有实机项目均已通过。
+- 开发阶段曾通过 171 项应用测试及 26 项连接层测试。仓库 CI 用于对后续修改重新验证；不把自动测试当作所有实机项目均已通过。
 - 自动软件更新已删除，升级需要手动安装。当前安装包未签名。
 
 ## 原作者、许可证与第三方素材

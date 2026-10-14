@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><title>ai-ping · 功能演示动画</title>
+<style>html,body{margin:0;background:#edf0f4}canvas{display:block;width:100%;height:auto}button{position:fixed;right:12px;bottom:12px;font:14px 'Microsoft YaHei';padding:8px 16px;border:1px solid #bac5d2;border-radius:8px;background:#fff;color:#17314d}button:focus-visible{outline:3px solid #337dc1}</style>
+<canvas id="stage" width="1440" height="900" aria-label="ai-ping 功能演示：桌面信号、矩形框选、选区外发送、Codex 分析与完成提醒"></canvas>
+<button id="toggle">暂停动画</button>
+<script>
+const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');
+const W=1440,H=900,DURATION=20;
+const ink='#172b43',muted='#53667a',blue='#2675bd',gold='#d2ac59';
+const icons=['pingwheel_retreatrender','push','omw','all_in','assist_me','need_vision','enemy_missing','enemy_vision'];
+const images={};
+const clamp=(v)=>Math.max(0,Math.min(1,v));
+const ease=(v)=>{v=clamp(v);return v*v*(3-2*v)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const phase=(t,a,b)=>ease((t-a)/(b-a));
+function box(x,y,w,h,r,fill,stroke){c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke()}}
+function text(s,x,y,size=22,color=ink,weight=400){c.fillStyle=color;c.font=`${weight} ${size}px "Microsoft YaHei", "Segoe UI", sans-serif`;c.fillText(s,x,y)}
+function line(x1,y1,x2,y2,color='#dce3eb',width=1){c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.lineWidth=width;c.strokeStyle=color;c.stroke()}
+function art(id,x,y,size,alpha=1){c.save();c.globalAlpha=alpha;c.drawImage(images[id],x-size/2,y-size/2,size,size);c.restore()}
+function key(s,x,y,on=false){box(x,y,70,38,7,on?'#203d5b':'#fff',on?'#203d5b':'#b6c2d0');text(s,x+16,y+26,19,on?'#fff':ink,600)}
+function cursor(x,y,pressed=false){c.save();c.translate(x,y);c.shadowColor='#10243e35';c.shadowBlur=5;c.shadowOffsetY=3;c.beginPath();c.moveTo(0,0);c.lineTo(0,29);c.lineTo(8,22);c.lineTo(14,36);c.lineTo(20,33);c.lineTo(14,20);c.lineTo(26,20);c.closePath();c.fillStyle=pressed?'#e9bf64':'#fff';c.fill();c.strokeStyle='#183047';c.lineWidth=2;c.stroke();c.restore()}
+function wheel(x,y,t,at,until,slot){if(t<at||t>=until)return;const scale=.85+.15*phase(t,at,at+.17);c.save();c.translate(x,y);c.scale(scale,scale);c.shadowColor='#0b203a40';c.shadowBlur=18;c.shadowOffsetY=7;const r=124,inner=39;c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fillStyle='#0d202cef';c.fill();c.shadowBlur=0;c.shadowOffsetY=0;for(let i=0;i<8;i++){const a=(i*45-112.5)*Math.PI/180,b=a+Math.PI/4;const selected=i===slot&&t>at+.42;c.beginPath();c.arc(0,0,r-3,a,b);c.arc(0,0,inner,b,a,true);c.closePath();c.fillStyle=selected?'#756332':'#142b37';c.fill();c.strokeStyle=selected?'#e7c37a':'#57717a';c.lineWidth=selected?2:1;c.stroke();const m=(a+b)/2;art(icons[i],Math.cos(m)*82,Math.sin(m)*82,47)}c.beginPath();c.arc(0,0,inner,0,Math.PI*2);c.fillStyle='#0d1f2a';c.fill();c.strokeStyle=gold;c.stroke();text('PING',-22,6,16,'#e2c37b',700);c.restore()}
+function ping(id,x,y,t,at,color){const age=t-at;if(age<0||age>1.45)return;const fade=1-phase(age,1.02,1.45),pop=1+.28*Math.exp(-age*7)*Math.sin(age*14);c.save();c.globalAlpha=fade;for(let i=0;i<2;i++){let k=clamp((age-i*.13)/.8);c.globalAlpha=fade*(1-k)*.8;c.beginPath();c.ellipse(x,y+17,20+76*k,8+26*k,0,0,Math.PI*2);c.strokeStyle=color;c.lineWidth=3-1.5*k;c.stroke()}c.globalAlpha=fade;art(id,x,y-18,83*pop);c.restore()}
+const R={x:110,y:367,w:658,h:190};
+function paper(){
+ box(48,181,792,574,15,'#fff');box(48,181,792,43,15,'#e6edf4');box(48,207,792,17,0,'#e6edf4');
+ text('学习笔记',73,210,17,muted,500);text('二分查找.md',181,210,17,ink,600);line(766,201,778,201,muted);box(793,196,10,10,0,null,muted);
+ text('二分查找，为什么这么快？',91,279,30,ink,600);
+ text('阅读笔记  /  算法与复杂度',93,311,16,muted);
+ line(92,337,796,337);
+ text('核心思路',131,405,20,blue,600);
+ text('每次比较，都排除一半不可能的答案。',131,446,25,ink,500);
+ text('n  →  n / 2  →  n / 4  →  …  →  1',131,493,29,ink,600);
+ text('查找次数：log₂(n)',131,533,23,muted);
+ text('例子：在 8 个有序元素中寻找目标',94,596,19,muted);
+ [2,5,8,12,16,23,38,56].forEach((v,i)=>{box(95+i*57,621,46,43,6,'#edf2f6');text(String(v),107+i*57,650,20,ink,500)});
+ text('框外内容仍可作为理解上下文的参考。',94,713,18,muted);
+}
+function selection(t){if(t<4.25||t>=9.45)return;const k=phase(t,4.25,5.65),alpha=1-phase(t,8.9,9.45);c.save();c.globalAlpha=alpha;box(R.x,R.y,R.w*k,R.h*k,3,'#3486c51b');c.lineWidth=2;c.strokeStyle=blue;c.strokeRect(R.x,R.y,R.w*k,R.h*k);if(k===1){for(const [x,y] of [[R.x,R.y],[R.x+R.w,R.y],[R.x,R.y+R.h],[R.x+R.w,R.y+R.h]])box(x-4,y-4,8,8,1,'#fff',blue);box(R.x,R.y-33,180,27,5,blue);text('分析重点 · 矩形选区',R.x+10,R.y-13,15,'#fff',500)}c.restore()}
+function thumbnail(x,y,w,h){box(x,y,w,h,8,'#edf4fa');text('框选内容',x+14,y+25,14,blue,600);text('每次比较，排除一半答案',x+14,y+52,17,ink,500);text('n → n / 2 → n / 4 → … → 1',x+14,y+81,17,ink,600);c.strokeStyle='#7cafd5';c.lineWidth=1;c.strokeRect(x+5,y+5,w-10,h-10)}
+function chat(t){
+ box(864,181,528,574,15,'#fff');text('Codex',891,216,23,ink,600);text('演示对话',989,215,15,muted);line(886,235,1370,235);
+ text(t<9?'已绑定接收聊天':t<10.3?'已收到截图':t<14.2?'正在分析':'本轮已完成',891,268,17,t<14.2?muted:'#247450',500);
+ if(t<9){text('把问题指给 AI 看。',907,414,30,ink,600);text('问号解释  ·  进攻讨论',908,457,20,muted);text('插眼保存  ·  协助讲解',908,493,20,muted);text('无需再描述“左边那一段”。',909,590,19,muted);return}
+ const a=phase(t,9,9.3);c.save();c.globalAlpha=a;box(890,290,476,60,10,'#eff3f7');art('enemy_missing',915,320,30);text('请解释框内的二分查找。',943,329,21,ink,500);
+ if(t>=9.6)thumbnail(890,363,354,101);
+ if(t>=10.3){text('Codex',891,504,17,ink,600);const rows=[['每次比较，候选范围都会减半。',540],['8 个元素 → 4 → 2 → 1',578],['所以查找次数随 log₂(n) 增长。',616],['框外的例子补充了这段内容的上下文。',662]];let n=Math.floor((t-10.3)*26);for(const [s,y] of rows){const shown=s.slice(0,Math.max(0,n));text(shown,891,y,y===662?18:21,y===662?muted:ink,y===578?600:400);n-=s.length}}
+ if(t>=14.2){const p=phase(t,14.2,14.45);c.globalAlpha=p;box(890,695,190,33,7,'#e8f3ec');text('已完成 · 自动提醒',904,718,17,'#247450',600)}c.restore();
+}
+function travel(t){if(t<9||t>9.72)return;const p=phase(t,9,9.72);const x=lerp(R.x,890,p),y=lerp(R.y,363,p)-Math.sin(p*Math.PI)*65,w=lerp(R.w,354,p),h=lerp(R.h,101,p);c.save();c.globalAlpha=1;box(x,y,w,h,9,'#edf4fa',blue);c.save();c.translate(x,y);c.scale(w/658,h/190);text('每次比较，都排除一半不可能的答案。',21,78,25,ink,500);text('n  →  n / 2  →  n / 4  →  …  →  1',21,126,29,ink,600);c.restore();c.restore()}
+const path=[ [0,526,684],[.65,326,647],[1.55,326,647],[2.1,452,647],[2.7,452,647],[3.6,110,367],[4.25,110,367],[5.65,768,557],[6.3,768,557],[7.15,704,653],[7.75,704,653],[8.55,572,653],[9.4,572,653],[10.1,704,653],[17.6,704,653],[19.8,526,684] ];
+function point(t){for(let i=1;i<path.length;i++){const [b,x,y]=path[i],[a,px,py]=path[i-1];if(t<=b){const k=phase(t,a,b);return [lerp(px,x,k),lerp(py,y,k)]}}return path.at(-1).slice(1)}
+function footer(t){const mode=t<3.5?0:t<6.7?1:t<9.5?2:t<14.2?3:4;
+ const titles=['桌面任何位置，都能发信号。','双击 Alt，拖出你想问的重点。','选区外也能发，信号留在鼠标起点。','框内是重点，全图是上下文。','Codex 完成这一轮，自动 ping 你。'];
+ const sub=['按住触发键 · 拖动选择 · 松手发送','先框选，再打开轮盘选择意图','松手发送问号，图片与任务准确对应','示例回答预设；真实分析需要等待','程序提醒不会触发新的截图任务'];
+ text(titles[mode],49,812,29,ink,600);text(sub[mode],50,849,19,muted);
+ if(mode===1){key('Alt',1226,788,t>3.5&&t<3.66||t>3.8&&t<3.96);text('× 2',1308,815,24,ink,600)}else if(mode===0||mode===2){key('Alt',1226,788,(t>1.1&&t<2.3)||(t>7.5&&t<8.8));text('拖动',1307,815,21,muted)}else{art(mode===3?'enemy_missing':'omw',1330,810,55)}
+ for(let i=0;i<5;i++){box(50+i*35,871,25,4,2,i===mode?blue:'#c6d1dd')}
+ text('ai-ping  ·  github.com/feifeitrue/ai-ping',945,875,16,muted);
+}
+window.renderAt=(time)=>{let t=((time%20)+20)%20;c.clearRect(0,0,W,H);c.fillStyle='#edf0f4';c.fillRect(0,0,W,H);
+ text('ai-ping',49,62,39,ink,700);text('圈定重点，发个信号。',49,129,46,ink,600);text('本地桌面 ping  +  Codex AI',974,125,25,muted,500);
+ text('功能演示动画 · 非实时录屏',1120,58,17,muted);
+ paper();chat(t);selection(t);travel(t);
+ wheel(326,647,t,1.1,2.3,2);ping('omw',326,647,t,2.3,'#398ed0');
+ wheel(704,653,t,7.5,8.8,6);ping('enemy_missing',704,653,t,8.8,'#cda849');ping('omw',704,653,t,14.2,'#398ed0');
+ const [x,y]=point(t);cursor(x,y,(t>=4.25&&t<5.65)||(t>=1.1&&t<2.3)||(t>=7.5&&t<8.8));footer(t);
+ if(t>18.8){const a=phase(t,18.8,20);c.save();c.globalAlpha=a;c.fillStyle='#edf0f4';c.fillRect(0,175,W,725);paper();chat(0);cursor(526,684);footer(0);c.restore()}
+};
+window.ready=Promise.all(icons.map(id=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images[id]=img;resolve()};img.onerror=reject;img.src='../assets/textures/'+id+'.png'}))).then(()=>{window.renderAt(0)});
+let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,start=performance.now(),held=0;
+document.querySelector('button').onclick=()=>{playing=!playing;if(playing)start=performance.now()-held*1000;document.querySelector('button').textContent=playing?'暂停动画':'播放动画'};
+if(!location.search.includes('render'))window.ready.then(()=>{function tick(now){if(playing&&!document.hidden){held=(now-start)/1000;window.renderAt(held)}requestAnimationFrame(tick)}requestAnimationFrame(tick)});
+if(location.search.includes('render'))document.querySelector('button').remove();
+</script></html>

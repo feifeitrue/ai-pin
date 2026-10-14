@@ -1,0 +1,1 @@
+{"name":"ai-ping-promo","private":true,"type":"module","scripts":{"render":"node render.mjs"},"dependencies":{"@ffmpeg-installer/win32-x64":"4.1.0","playwright-core":"1.64.0"}}

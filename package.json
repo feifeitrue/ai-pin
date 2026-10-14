@@ -1,17 +1,21 @@
 {
-  "name": "aiping",
-  "productName": "aiping",
-  "version": "0.5.4",
+  "name": "ai-ping",
+  "productName": "ai-ping",
+  "version": "0.5.5",
   "private": true,
-  "description": "aiping: local desktop pings, rectangular screenshot focus and Codex desktop integration",
-  "author": "Danrui Meng (https://github.com/darrenprx)",
+  "description": "ai-ping: local desktop pings, rectangular screenshot focus and Codex desktop integration",
+  "author": {
+    "name": "feifeiture",
+    "email": "fefeedong@gmail.com",
+    "url": "https://github.com/feifeitrue"
+  },
   "license": "MIT",
-  "homepage": "https://github.com/feifeitrue/ai-pin#readme",
+  "homepage": "https://github.com/feifeitrue/ai-ping#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/feifeitrue/ai-pin.git"
+    "url": "https://github.com/feifeitrue/ai-ping.git"
   },
-  "bugs": "https://github.com/feifeitrue/ai-pin/issues",
+  "bugs": "https://github.com/feifeitrue/ai-ping/issues",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -44,7 +48,7 @@
   },
   "build": {
     "appId": "com.lolping.app",
-    "productName": "aiping",
+    "productName": "ai-ping",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -78,7 +82,7 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "aiping-Setup-${version}.exe",
+      "artifactName": "ai-ping-Setup-${version}.exe",
       "include": "build/installer.nsh",
       "differentialPackage": false
     },
@@ -109,25 +113,24 @@
         }
       ],
       "extendInfo": {
-        "NSAccessibilityUsageDescription": "aiping reads mouse and keyboard input to open the ping wheel."
+        "NSAccessibilityUsageDescription": "ai-ping reads mouse and keyboard input to open the ping wheel."
       }
     },
     "dmg": {
-      "artifactName": "aiping-${version}-arm64.dmg"
+      "artifactName": "ai-ping-${version}-arm64.dmg"
     },
     "extraFiles": [
       {
         "from": "LICENSE",
-        "to": "LICENSE-lolPing.txt"
+        "to": "LICENSE-ai-ping.txt"
       }
     ],
     "publish": null
   },
   "contributors": [
     {
-      "name": "feifeitrue",
-      "email": "fefeedong@gmail.com",
-      "url": "https://github.com/feifeitrue"
+      "name": "Danrui Meng",
+      "url": "https://github.com/darrenprx"
     }
   ]
 }

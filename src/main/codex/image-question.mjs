@@ -29,7 +29,7 @@ export function imageQuestion(request) {
   const instruction = request.instruction || '解释图片中的内容。';
   const record = { questionId, intent, ping, path, capture, instruction };
   const resultTool = (process.env.AIPIN_RESULT_RUNNER || join(process.env.AIPIN_BRIDGE_DIR || '.', 'return-result.cmd')).replace(/'/g, "''");
-  const prompt = `[aiping AI 任务 ${questionId}；意图 ${intent}]
+  const prompt = `[ai-ping AI 任务 ${questionId}；意图 ${intent}]
 本聊天负责接收和汇总。本聊天如果已授权独立子智能体处理，可按已有授权分配；没有这项授权时由主聊天直接分析，不额外要求用户启用子智能体。分配时完整保留编号、图片路径、坐标和意图，不合并不同任务。并发达到上限时排队，不丢弃问题。
 实际处理者必须用读图工具打开原图及可用的局部图，只分析本编号。主聊天分配时必须完整传递以下处理要求，不能缩减为“看图简洁解释”。处理要求：${DIRECTIONS[intent]}
 主聊天汇总时保留完整任务编号与坐标，不按完成顺序猜测对应关系。分析完毕后主聊天必须在自己的工作目录写一个 UTF-8 JSON 文件，内容为 {"questionId":"${questionId}","title":"具体标题","answer":"完整分析或讲解正文"}，然后在 PowerShell 执行 & '${resultTool}' '该JSON文件的绝对路径'。不需要安装 Node。只有命令返回 savedPath 才报告已保存；失败要如实说明。这个命令将结果与正确任务关联，并为插眼任务复制原图、局部图和坐标供留存。不要仅说已记录却不调用保存命令。

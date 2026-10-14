@@ -8,7 +8,7 @@ import { rendererPatch } from '../shared/settings';
 import type { SettingsStore } from './settingsStore';
 import type {CodexConnection} from './codexConnection';
 
-const PROJECT_URL = 'https://github.com/feifeitrue/ai-pin';
+const PROJECT_URL = 'https://github.com/feifeitrue/ai-ping';
 
 export interface SettingsIpcDeps {
   codex:CodexConnection;

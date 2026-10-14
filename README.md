@@ -1,6 +1,8 @@
-# aiping · 桌面信号 + Codex AI
+# ai-ping · 桌面信号 + Codex AI
 
 > **当前支持范围：AI 联动暂时只支持 Codex Windows 桌面版。** 暂不支持 Codex 网页版、CLI、macOS 桌面版或其他 AI 工具；普通本地 ping 无需连接 Codex。
+
+由 **feifeiture** 维护。
 
 在桌面上发出 ping，用截图和指向位置向 Codex 提问；也可以先框出重点，再发信号。普通 ping 保持独立可用。
 
@@ -16,18 +18,18 @@
 
 框选内容，在选区外发问号；以框内为主解释原因与适用边界。
 
-![问号：解释所指内容](docs/media/aiping/aiping-question.gif)
+![问号：解释所指内容](docs/media/ai-ping/ai-ping-question.gif)
 
-[查看有声 MP4](docs/media/aiping/aiping-question.mp4)
+[查看有声 MP4](docs/media/ai-ping/ai-ping-question.mp4)
 
 <details>
 <summary>全力进攻：表达观点（展开动画）</summary>
 
 针对所指话题给出明确观点、理由、适用条件和关键反例。
 
-![全力进攻：表达观点](docs/media/aiping/aiping-allin.gif)
+![全力进攻：表达观点](docs/media/ai-ping/ai-ping-allin.gif)
 
-[查看有声 MP4](docs/media/aiping/aiping-allin.mp4)
+[查看有声 MP4](docs/media/ai-ping/ai-ping-allin.mp4)
 
 </details>
 
@@ -36,9 +38,9 @@
 
 框选值得留存的内容，整理笔记，写入成功后才提示已保存。
 
-![需要视野：整理并保存](docs/media/aiping/aiping-needvision.gif)
+![需要视野：整理并保存](docs/media/ai-ping/ai-ping-needvision.gif)
 
-[查看有声 MP4](docs/media/aiping/aiping-needvision.mp4)
+[查看有声 MP4](docs/media/ai-ping/ai-ping-needvision.mp4)
 
 </details>
 
@@ -47,9 +49,9 @@
 
 自由指向内容，保存正文、原图、局部图和对应坐标。
 
-![敌方视野：分析并记录](docs/media/aiping/aiping-enemyvision.gif)
+![敌方视野：分析并记录](docs/media/ai-ping/ai-ping-enemyvision.gif)
 
-[查看有声 MP4](docs/media/aiping/aiping-enemyvision.mp4)
+[查看有声 MP4](docs/media/ai-ping/ai-ping-enemyvision.mp4)
 
 </details>
 
@@ -58,9 +60,9 @@
 
 先通俗讲解，再举例、对比并指出常见误解。
 
-![请求协助：带你理解知识](docs/media/aiping/aiping-assist.gif)
+![请求协助：带你理解知识](docs/media/ai-ping/ai-ping-assist.gif)
 
-[查看有声 MP4](docs/media/aiping/aiping-assist.mp4)
+[查看有声 MP4](docs/media/ai-ping/ai-ping-assist.mp4)
 
 </details>
 
@@ -84,11 +86,11 @@
 
 自动提醒已实现：Codex 需要回答或审批时发出“请求协助”，本轮结束时发出“正在赶来 / 正在路上”。这些是程序提醒，不会再次触发截图或 AI 任务，与用户主动发送信号的 AI 映射分别处理。
 
-对尚未实现的信号有想法？欢迎 [提交 Issue](https://github.com/feifeitrue/ai-pin/issues/new)，说说你希望在哪个场景使用这个 ping，以及期待 AI 做什么。
+对尚未实现的信号有想法？欢迎 [提交 Issue](https://github.com/feifeitrue/ai-ping/issues/new)，说说你希望在哪个场景使用这个 ping，以及期待 AI 做什么。
 
 ## 即将推出
 
-**支持自定义 ping 提示词的版本很快也会到来。** 届时可以按自己的习惯设置各个 ping 要交给 AI 的指令。当前发布版尚未提供这个设置；欢迎在 [Issues](https://github.com/feifeitrue/ai-pin/issues) 分享想法和使用场景。
+**支持自定义 ping 提示词的版本很快也会到来。** 届时可以按自己的习惯设置各个 ping 要交给 AI 的指令。当前发布版尚未提供这个设置；欢迎在 [Issues](https://github.com/feifeitrue/ai-ping/issues) 分享想法和使用场景。
 
 ## 相比原项目改了什么
 
@@ -105,21 +107,21 @@
 
 ## 开始使用
 
-**[下载 Windows x64 安装包（0.5.4）](https://github.com/feifeitrue/ai-pin/releases/download/windows-0.5.4-preview.1/aiping-Setup-0.5.4.exe)** · [安装与连接说明](https://github.com/feifeitrue/ai-pin/releases/tag/windows-0.5.4-preview.1)
+**[下载 Windows x64 安装包（0.5.5）](https://github.com/feifeitrue/ai-ping/releases/download/windows-0.5.5-preview.1/ai-ping-Setup-0.5.5.exe)** · [安装与连接说明](https://github.com/feifeitrue/ai-ping/releases/tag/windows-0.5.5-preview.1)
 
 建议使用 AI 助手协助完成安装和初次使用；也可以按照下面的步骤自行操作。
 
 ### 安装后如何连接 Codex
 
-1. **安装 aiping。** 下载上方 `.exe`，按向导安装，再从桌面或开始菜单快捷方式启动。
-2. **打开 Codex 桌面版并登录。** 新建或打开一个接收截图的聊天，例如“aiping 助手”，先发送一句消息，方便在列表中识别。
-3. **发现 Codex。** aiping 首次启动会打开「Codex 连接」；之后也可从托盘打开设置，进入该页面，点击「连接 Codex」。
+1. **安装 ai-ping。** 下载上方 `.exe`，按向导安装，再从桌面或开始菜单快捷方式启动。
+2. **打开 Codex 桌面版并登录。** 新建或打开一个接收截图的聊天，例如“ai-ping 助手”，先发送一句消息，方便在列表中识别。
+3. **发现 Codex。** ai-ping 首次启动会打开「Codex 连接」；之后也可从托盘打开设置，进入该页面，点击「连接 Codex」。
 4. **选择聊天并启用。** 在列表中选择刚才的接收聊天，点击「连接并启用 AI」。确认页面显示「已连接」，并核对聊天名称。
 5. **发出第一个 AI 信号。** 打开一段不含敏感信息的内容，将鼠标放到想问的位置，按设置中的触发方式打开轮盘，拖动选择问号并松手发送。在绑定的 Codex 聊天中查看截图和回答。
 
-无需另装 Node、填写 API Key、配置环境变量或修改 Codex hooks；使用 Codex 已有的账号、模型和权限设置。连接选择会保存，aiping 重启后自动恢复。更换聊天时，在「Codex 连接」中重新选择并连接即可。
+无需另装 Node、填写 API Key、配置环境变量或修改 Codex hooks；使用 Codex 已有的账号、模型和权限设置。连接选择会保存，ai-ping 重启后自动恢复。更换聊天时，在「Codex 连接」中重新选择并连接即可。
 
-找不到聊天时，确认 Codex 桌面版正在运行且已登录，在目标聊天发送一句消息，再回到 aiping 刷新列表。仍无法连接时，请在 Issue 中附上错误提示和 Codex 版本，勿上传连接凭据。
+找不到聊天时，确认 Codex 桌面版正在运行且已登录，在目标聊天发送一句消息，再回到 ai-ping 刷新列表。仍无法连接时，请在 Issue 中附上错误提示和 Codex 版本，勿上传连接凭据。
 
 ### 框选与日常使用
 
@@ -130,7 +132,7 @@
 
 框选使用进入时固定的截图，不会因随后切换窗口而换成另一张图片。截图会发送到你选择的聊天，发送前请留意画面中的敏感内容。
 
-从 0.5.2 起，程序、窗口、托盘、快捷方式与安装包统一命名为 `aiping`。升级继续使用旧的 `lolPing` 数据目录，保留设置、截图、笔记和聊天绑定；内部兼容标识及旧环境变量不变。GitHub 仓库地址仍为 `feifeitrue/ai-pin`。详细操作、目录说明和构建要求见 [中文使用说明](README.zh-CN.md)。
+从 0.5.5 起，程序、窗口、托盘、快捷方式、安装包与仓库统一命名为 `ai-ping`，维护者署名为 **feifeiture**。升级继续使用旧的 `lolPing` 数据目录，保留设置、截图、笔记和聊天绑定；内部兼容标识及旧环境变量不变。GitHub 仓库地址为 `feifeitrue/ai-ping`。详细操作、目录说明和构建要求见 [中文使用说明](README.zh-CN.md)。
 
 ## 从源码构建
 
@@ -148,6 +150,10 @@ npm run dist
 
 `npm run dist` 生成 Windows 安装包到 `release/`。日常开发可使用 `npm run dev`。macOS 原实现保留，但本版本的一键 Codex 接入仅支持 Windows，未做 macOS 实机验收。
 
+## 0.5.5：统一项目名称
+
+应用和仓库统一为 **ai-ping**，维护者为 **feifeiture**。保留上游 lolPing 的来源说明和 Danrui Meng 的版权声明。旧配置目录、安装标识和接口兼容名称保留，升级无需重新绑定聊天。
+
 ## 0.5.4：音画同步
 
 信号音效提交播放后，按设备输出时间和音效起音位置安排图标出现；打开轮盘时提前唤醒音频。动画不再总是抢在声音前面，等待时间随设备变化，不固定为 90 毫秒。
@@ -161,7 +167,7 @@ npm run dist
 - 增加同一配置目录的连接进程互斥，避免同时启动两份服务。所有本机用户聊天的提问与完成提醒继续保留。
 - 开发机完成真实提问、回答后状态清除和真实任务完成提醒验证。一次 30 秒采样中，连接进程 CPU 约 0.003%，两条活跃聊天约 24 次读取/分钟；这是特定环境的实测值，不是所有机器的性能保证。
 
-从旧版升级前，请从托盘退出 aiping，再运行新版安装包。如果你另行手动运行过早期独立连接脚本，也应停止该脚本，避免与安装版重复监听。正常安装版用户无需另装或启动任何连接脚本。升级保留配置、截图和笔记，不自动清理用户数据。
+从旧版升级前，请从托盘退出 ai-ping，再运行新版安装包。如果你另行手动运行过早期独立连接脚本，也应停止该脚本，避免与安装版重复监听。正常安装版用户无需另装或启动任何连接脚本。升级保留配置、截图和笔记，不自动清理用户数据。
 
 ## 数据与已知限制
 
@@ -169,7 +175,7 @@ npm run dist
 - 默认截图保存在应用数据目录 `captures/`，笔记和结果在 `codex/tasks/`；聊天绑定保存在本机，不随源码分发。连接层会读取本机 Codex 会话记录以识别状态提醒。
 - 发送队列在内存中，**不支持崩溃或退出恢复**。发送结果不明确时不会自动重发；笔记实际落盘后才提示已保存。
 - Codex 连接使用桌面兼容接口，并非承诺长期稳定的公开集成 API。已验证桌面版 `26.1007.2314.0`，升级后需复测。
-- 已在另一台安装了 Codex 的机器上安装测试了 aiping 安装包。
+- 已在另一台安装了 Codex 的机器上安装测试了 ai-ping 安装包。
 - 开发机已验证 Windows 双屏 100% 缩放；真实混合缩放和 macOS 尚未验收。
 - 开发阶段曾通过 171 项应用测试及 26 项连接层测试。仓库 CI 用于对后续修改重新验证；不把自动测试当作所有实机项目均已通过。
 - 自动软件更新已删除，升级需要手动安装。当前安装包未签名。
@@ -182,4 +188,4 @@ npm run dist
 - 本项目不由 Riot Games、原项目作者或 OpenAI 赞助、背书或官方维护。相关商标归各自权利人所有。Riot 素材使用政策见 [Riot Games 官方法律页面](https://www.riotgames.com/en/legal)。
 - 涉及权利问题请联系 **[fefeedong@gmail.com](mailto:fefeedong@gmail.com)**，提供相关内容的位置和权属说明；维护者将及时核实并删除相关内容。
 
-`docs/design*.md` 和 `docs/media/` 中原有图片来自上游，可能包含本版本已删除的功能；`docs/media/aiping/` 是本版本新制作的功能演示动画。本版本功能以本 README 和当前源码为准。
+`docs/design*.md` 和 `docs/media/` 中原有图片来自上游，可能包含本版本已删除的功能；`docs/media/ai-ping/` 是本版本新制作的功能演示动画。本版本功能以本 README 和当前源码为准。

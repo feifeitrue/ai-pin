@@ -21,7 +21,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release list --limit 200 --json tagName --jq '.[].tagName' | grep -Fx "$GITHUB_REF_NAME" > /dev/null \
-            || gh release create "$GITHUB_REF_NAME" --title "aiping $GITHUB_REF_NAME" --generate-notes --draft
+            || gh release create "$GITHUB_REF_NAME" --title "ai-ping $GITHUB_REF_NAME" --generate-notes --draft
 
   windows:
     needs: release
@@ -45,7 +45,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "$GITHUB_REF_NAME" \
-            "release/aiping-Setup-${GITHUB_REF_NAME#v}.exe" \
+            "release/ai-ping-Setup-${GITHUB_REF_NAME#v}.exe" \
             --clobber
 
   mac:
@@ -64,11 +64,11 @@ jobs:
       - run: npm test
       - run: npm run test:codex
       - run: npm run dist:mac
-      - run: codesign --verify --deep --strict "release/mac-arm64/aiping.app"
+      - run: codesign --verify --deep --strict "release/mac-arm64/ai-ping.app"
       - name: Upload the disk image
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$GITHUB_REF_NAME" "release/aiping-${GITHUB_REF_NAME#v}-arm64.dmg" --clobber
+        run: gh release upload "$GITHUB_REF_NAME" "release/ai-ping-${GITHUB_REF_NAME#v}-arm64.dmg" --clobber
 
   # Both installers are uploaded: only now does the draft become the latest release.
   publish:

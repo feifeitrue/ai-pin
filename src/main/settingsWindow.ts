@@ -40,7 +40,7 @@ const chromeOptions = (): BrowserWindowConstructorOptions => (IS_MAC
     titleBarOverlay: captionColors(),
   });
 
-/** aiping lives in the macOS menu bar: it only has a Dock icon (and ⌘-Tab entry) while settings are open. */
+/** ai-ping lives in the macOS menu bar: it only has a Dock icon (and ⌘-Tab entry) while settings are open. */
 function showInDock(on: boolean): void {
   if (!IS_MAC) return;
   if (on) {
@@ -85,7 +85,7 @@ export function openSettingsWindow(section?: string): BrowserWindow {
     height: 680,
     minWidth: 720,
     minHeight: 520,
-    title: 'aiping',
+    title: 'ai-ping',
     icon: nativeImage.createFromPath(assetPath('textures', 'generic_ping.png')),
     show: false,
     ...chromeOptions(),

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><title>ai-ping · 功能演示动画</title>
+<style>html,body{margin:0;background:#edf0f4}canvas{display:block;width:100%;height:auto}button{position:fixed;right:12px;bottom:12px;font:14px 'Microsoft YaHei';padding:8px 16px;border:1px solid #bac5d2;border-radius:8px;background:#fff;color:#17314d}button:focus-visible{outline:3px solid #337dc1}</style>
+<canvas id="stage" width="1440" height="900" aria-label="ai-ping 功能演示：桌面信号、矩形框选、选区外发送、Codex 分析与完成提醒"></canvas>
+<button id="toggle">暂停动画</button>
+<script>
+const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');
+const W=1440,H=900,DURATION=20;
+const ink='#172b43',muted='#53667a',blue='#2675bd',gold='#d2ac59';
+const icons=['pingwheel_retreatrender','push','omw','all_in','assist_me','need_vision','enemy_missing','enemy_vision'];
+const images={};
+const clamp=(v)=>Math.max(0,Math.min(1,v));
+const ease=(v)=>{v=clamp(v);return v*v*(3-2*v)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const phase=(t,a,b)=>ease((t-a)/(b-a));
+function box(x,y,w,h,r,fill,stroke){c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke()}}
+function text(s,x,y,size=22,color=ink,weight=400){c.fillStyle=color;c.font=`${weight} ${size}px "Microsoft YaHei", "Segoe UI", sans-serif`;c.fillText(s,x,y)}
+function line(x1,y1,x2,y2,color='#dce3eb',width=1){c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.lineWidth=width;c.strokeStyle=color;c.stroke()}
+function art(id,x,y,size,alpha=1){c.save();c.globalAlpha=alpha;c.drawImage(images[id],x-size/2,y-size/2,size,size);c.restore()}
+function key(s,x,y,on=false){box(x,y,70,38,7,on?'#203d5b':'#fff',on?'#203d5b':'#b6c2d0');text(s,x+16,y+26,19,on?'#fff':ink,600)}
+function cursor(x,y,pressed=false){c.save();c.translate(x,y);c.shadowColor='#10243e35';c.shadowBlur=5;c.shadowOffsetY=3;c.beginPath();c.moveTo(0,0);c.lineTo(0,29);c.lineTo(8,22);c.lineTo(14,36);c.lineTo(20,33);c.lineTo(14,20);c.lineTo(26,20);c.closePath();c.fillStyle=pressed?'#e9bf64':'#fff';c.fill();c.strokeStyle='#183047';c.lineWidth=2;c.stroke();c.restore()}
+function wheel(x,y,t,at,until,slot){if(t<at||t>=until)return;const scale=.85+.15*phase(t,at,at+.17);c.save();c.translate(x,y);c.scale(scale,scale);c.shadowColor='#0b203a40';c.shadowBlur=18;c.shadowOffsetY=7;const r=124,inner=39;c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fillStyle='#0d202cef';c.fill();c.shadowBlur=0;c.shadowOffsetY=0;for(let i=0;i<8;i++){const a=(i*45-112.5)*Math.PI/180,b=a+Math.PI/4;const selected=i===slot&&t>at+.42;c.beginPath();c.arc(0,0,r-3,a,b);c.arc(0,0,inner,b,a,true);c.closePath();c.fillStyle=selected?'#756332':'#142b37';c.fill();c.strokeStyle=selected?'#e7c37a':'#57717a';c.lineWidth=selected?2:1;c.stroke();const m=(a+b)/2;art(icons[i],Math.cos(m)*82,Math.sin(m)*82,47)}c.beginPath();c.arc(0,0,inner,0,Math.PI*2);c.fillStyle='#0d1f2a';c.fill();c.strokeStyle=gold;c.stroke();text('PING',-22,6,16,'#e2c37b',700);c.restore()}
+function ping(id,x,y,t,at,color){const age=t-at;if(age<0||age>1.45)return;const fade=1-phase(age,1.02,1.45),pop=1+.28*Math.exp(-age*7)*Math.sin(age*14);c.save();c.globalAlpha=fade;for(let i=0;i<2;i++){let k=clamp((age-i*.13)/.8);c.globalAlpha=fade*(1-k)*.8;c.beginPath();c.ellipse(x,y+17,20+76*k,8+26*k,0,0,Math.PI*2);c.strokeStyle=color;c.lineWidth=3-1.5*k;c.stroke()}c.globalAlpha=fade;art(id,x,y-18,83*pop);c.restore()}
+</script><script src="signals.js"></script></html>
